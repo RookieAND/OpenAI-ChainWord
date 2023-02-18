@@ -1,4 +1,4 @@
-# KUAGORA
+# OpenAI-ChainWord
 
 ## 📑 Description
 
