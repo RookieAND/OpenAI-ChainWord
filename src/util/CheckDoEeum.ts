@@ -5,7 +5,7 @@ const JONGSEONG = 'Xㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆ
 export const CheckDoEeum = (word: string) => {
   let char = word.charCodeAt(0);
   if (char < HANGUL_FIRST_CODE || char > HANGUL_LAST_CODE) return word;
-  switch ((char - HANGUL_FIRST_CODE) / JONGSEONG.length) {
+  switch (0 | ((char - HANGUL_FIRST_CODE) / JONGSEONG.length)) {
     // 녀, 뇨, 뉴, 니 => 여, 요, 유, 니
     case 48:
     case 54:

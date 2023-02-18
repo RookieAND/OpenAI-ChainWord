@@ -1,6 +1,7 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { VITE_OPENAI_API_KEY } from '@/constants';
 
+type WordDifficulty = 'easy' | 'complicated';
 type ApiResult = ApiSuccess | ApiError;
 
 interface ApiSuccess {
@@ -23,7 +24,7 @@ const openai = new OpenAIApi(configuration);
 export const createCompletion = async (message: string): Promise<ApiResult> => {
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
-    prompt: `${message} is existed in Korean? and it is Noun? tell me if it is True, or False`,
+    prompt: `${message} is existed in Korean? and it is Noun? tell me if it is just say True, or False`,
     max_tokens: 2048,
     temperature: 0.2,
   });
@@ -37,10 +38,13 @@ export const createCompletion = async (message: string): Promise<ApiResult> => {
   };
 };
 
-export const getNextWord = async (firstWord: string): Promise<ApiResult> => {
+export const getNextWord = async (
+  firstWord: string,
+  difficulty: WordDifficulty,
+): Promise<ApiResult> => {
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
-    prompt: `tell me one korean noun by starting '${firstWord}'. it's length is more than 2 and less than 4.`,
+    prompt: `tell me one korean noun by starting '${firstWord}'. it's ${difficulty} and it's length is more than 2 and less than 4.`,
     temperature: 0.2,
   });
   if (response.data?.choices) {

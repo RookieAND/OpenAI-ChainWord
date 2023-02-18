@@ -6,6 +6,8 @@ function App() {
   const [word, setWord] = useState('');
   const [usedWord, setUsedWord] = useState<Set<string>>(new Set());
 
+  const usedWordAmount = Array.from(usedWord).length;
+
   const handleWord = (event: React.ChangeEvent<HTMLInputElement>) => {
     const typedWord = event.target.value;
     if (typedWord.length > 3) return;
@@ -44,18 +46,22 @@ function App() {
   };
 
   const getNewWord = async (char: string) => {
-    const newWordRes = await getNextWord(char.at(-1) as string);
-    if (!newWordRes.isSuccess) {
-      console.log('AI 에게 답변을 받아오는데 실패했습니다.');
-      return undefined;
+    while (true) {
+      const newWordRes = await getNextWord(
+        char.at(-1) as string,
+        usedWordAmount > 10 ? 'complicated' : 'easy',
+      );
+      if (!newWordRes.isSuccess) {
+        console.log('AI 에게 답변을 받아오는데 실패했습니다.');
+        return undefined;
+      }
+      const newWord = newWordRes.result?.trim() as string;
+      if (newWord in usedWord) {
+        console.log('이미 이전에 존재하는 단어를 받아왔습니다.');
+        continue;
+      }
+      return newWord;
     }
-    const newWord = newWordRes.result as string;
-    if (newWord in usedWord) {
-      console.log('이미 이전에 존재하는 단어를 받아왔습니다.');
-      getNewWord(char);
-      return;
-    }
-    return newWord;
   };
 
   return (
@@ -63,13 +69,15 @@ function App() {
       <input value={word} onKeyDown={EnterWord} onChange={handleWord}></input>
       <button onClick={sendQuestion}>단어 말하기</button>
       <button onClick={applyDoEeum}>두음법칙 적용하기</button>
-      <h5>현재까지 이야기 한 단어 : {Array.from(usedWord).length}</h5>
+      <h5>현재까지 이야기 한 단어 : {usedWordAmount}</h5>
       <div>
-        {Array.from(usedWord).map((keyword: string, idx: number) => (
-          <p>
-            {idx % 2 == 0 ? '나' : 'AI'} : {keyword}
-          </p>
-        ))}
+        {Array.from(usedWord)
+          .reverse()
+          .map((keyword: string, idx: number) => (
+            <p>
+              {idx % 2 == 1 ? '나' : 'AI'} : {keyword}
+            </p>
+          ))}
       </div>
     </div>
   );
